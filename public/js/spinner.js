@@ -1,0 +1,1 @@
+(()=>{var d=document.createElement("div");d.innerHTML='<div class="loader-wrapper"><div class="loader">Loading...</div></div>',document.body.insertBefore(d,document.body.firstChild),document.addEventListener("DOMContentLoaded",(function(d){document.body.className+=" loaded"}))})();
