@@ -1,0 +1,45 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+ Header set Access-Control-Allow-Origin "domain"
+ Header set Accept-Ranges: bytes
+ Header set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+ Header set Content-Security-Policy "default-src *;img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;style-src  'self' 'unsafe-inline' *; object-src 'self' *;frame-src 'self' blob: *; frame-ancestors 'self';"
+ Header set X-XSS-Protection "1; mode=block"
+ Header always unset server
+ Header always unset X-Powered-By
+ Header always unset server
+ Header unset X-Powered-By
+ Header unset server
+ Header always unset X-Frame-Options
+</IfModule>
+
+php_value post_max_size 512M
+php_value max_input_vars 10000
+php_value upload_max_filesize 512M
+php_value memory_limit 5120M
+php_value max_execution_time 300
+

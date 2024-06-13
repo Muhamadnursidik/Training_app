@@ -1,0 +1,65 @@
+@extends('layout.login')
+
+@section('content')
+    <div class="page-content d-flex align-items-center justify-content-center">
+
+        <div class="row w-100 mx-0 auth-page">
+            <div class="col-md-6 col-xl-5 mx-auto">
+                <div class="card">
+                    <div class="row">
+                        <div class="col-md-4 pe-md-0">
+                            <div class="auth-side-wrapper" style="background-image: url('../img/login-image.png')">
+                                
+                            </div>
+                        </div>
+                        <div class="col-md-8 ps-md-0">
+                            <div class="auth-form-wrapper px-4 py-4">
+                                <a href="#" class="noble-ui-logo d-block mb-2">APLIKASI {{ config('data.app_nickname') }}<span></span></a>
+                                <h5 class="text-muted fw-normal mb-4">{{ config('data.app_name') }}</h5>
+                                <form class="forms-sample" action="{{ route('login') }}" method="POST" novalidate autocomplete="false">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="username">Username</label>
+                                        <input type="text" name="username"
+                                            class="form-control {{ $errors->has('username') ? ' is-invalid' : '' }}"
+                                            id="username" placeholder="Username" autocomplete="false">
+                                        @if ($errors->has('username'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('username') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputPassword1">Password</label>
+                                        <input type="password"
+                                            class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}"
+                                            name="password" id="password" autocomplete="false"
+                                            placeholder="Password">
+                                        @if ($errors->has('password'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('password') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input type="checkbox" name="remember" class="form-check-input" id="authCheck">
+                                        <label class="form-check-label" for="authCheck">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0 text-white">
+                                            <i class="btn-icon-prepend fas fa-lock"></i>
+                                            Login
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+@endsection

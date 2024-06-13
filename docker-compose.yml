@@ -1,0 +1,8 @@
+services:
+  orsa-app:
+    container_name: orsa-app
+    build: .
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 80:80
