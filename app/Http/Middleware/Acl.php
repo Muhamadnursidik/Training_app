@@ -18,11 +18,11 @@ class Acl
         $whitelist = config('acl.whitelist');
         $route_name = $request->route()->getName();
         // dd($route_name);
-        if (!in_array($route_name, $whitelist)) {
-            if (!auth()->user()->can($route_name)) {
-                abort(403);
-            }
-        }
+        // if (!in_array($route_name, $whitelist)) {
+        //     if (!auth()->user()->can($route_name)) {
+        //         abort(403);
+        //     }
+        // }
         
         return $next($request);
     }
