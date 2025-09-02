@@ -5,17 +5,17 @@
     "keywords": ["orsa","led","kri","rcsa"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "askedio/laravel-soft-cascade": "*",
         "carlos-meneses/laravel-mpdf": "*",
         "guzzlehttp/guzzle": "^7.8",
         "jenssegers/agent": "^2.6",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^12.0",
         "laravel/passport": "^12.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
-        "mariuzzo/laravel-js-localization": "^1.11",
+        "mariuzzo/laravel-js-localization": "^2.0",
         "mews/captcha": "*",
         "nesbot/carbon": "^3.3",
         "phpoffice/phpspreadsheet": "^2.0",
@@ -27,7 +27,7 @@
         "staudenmeir/eloquent-json-relations": "^1.12",
         "unisharp/laravel-filemanager": "^2.9",
         "webpatser/laravel-uuid": "^4.0",
-        "yajra/laravel-datatables-oracle": "^11.1"
+        "yajra/laravel-datatables-oracle": "^12.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
