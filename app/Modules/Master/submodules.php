@@ -3,4 +3,5 @@
 return [
     'Unitkerja',
     'Tipeunitkerja',
+    'Dataliburnasional',
 ];
