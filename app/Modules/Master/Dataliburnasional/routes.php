@@ -1,9 +1,11 @@
 <?php
+Route::delete('/dataliburnasional/{id}', [App\Modules\Master\Dataliburnasional\Controller::class, 'destroy'])
+    ->name('dataliburnasional.destroy');
+
 Route::resource('dataliburnasional', 'App\Modules\Master\Dataliburnasional\Controller', [
-    'names' => 'dataliburnasional'
+    'names' => 'dataliburnasional',
+    'except' => ['destroy']
 ]);
-Route::delete('dataliburnasional/{id}', ['App\Modules\Master\Dataliburnasional\Controller@destroy'])->name('dataliburnasional.destroy');
-Route::delete('dataliburnasional', ['App\Modules\Master\Dataliburnasional\Controller@destroys'])->name('dataliburnasional.destroys');
 
 Route::get('dataliburnasional/generatedropdownbytipe', ['\App\Modules\Master\dataliburnasional\Controller@generatedropdownbytipe'])->name('dataliburnasional.generatedropdownbytipe');
 Route::get('dataliburnasional/generatedropdownbagian', ['\App\Modules\Master\dataliburnasional\Controller@generatedropdownbagian'])->name('dataliburnasional.generatedropdownbagian');

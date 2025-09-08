@@ -8,11 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Model extends EloquentModel
 {
     use SoftDeletes;
+    protected $date = ['tanggal'];
+    protected $table = 'dataliburnasional';
 
-    // Nama tabel yang sesuai
-    protected $table = 'dataliburnasional'; // sesuaikan dengan nama tabel kamu
-
-    // Field yang bisa diisi mass assignment
     protected $fillable = [
         'tanggal',
         'keterangan'
@@ -35,15 +33,13 @@ class Model extends EloquentModel
         return $query->select('id', 'tanggal', 'keterangan', 'created_at', 'updated_at', 'deleted_at');
     }
 
-    // Dalam model
-protected static function boot()
-{
-    parent::boot();
+    public function getTanggalAttribute($value)
+    {
+        return $value ? \Carbon\Carbon::parse($value)->format('d-m-Y'): null;
+    }
     
-    static::deleting(function ($model) {
-        Log::info('Model deleting event triggered:', ['id' => $model->id]);
-        // Jika return false, penghapusan akan dibatalkan
-        return true;
-    });
-}
+    protected static function boot()
+    {
+        parent::boot();
+    }
 }

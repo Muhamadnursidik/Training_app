@@ -13,7 +13,7 @@ class Repository extends BaseRepository
 
     public function getInput($request) {
         $this->data = [
-            'id'          => $request('_id'),
+            'id'          => $request('id'),
             'tanggal'     => $request('tanggal'),
             'keterangan'  => $request('keterangan'),
         ];

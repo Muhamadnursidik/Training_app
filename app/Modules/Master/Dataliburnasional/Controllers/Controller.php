@@ -141,28 +141,21 @@ public function store(Request $request)
         }
     }
 
-public function destroy(Request $request, $id)
+public function destroy($id)
 {
-    // Gunakan 'id' bukan '_id' agar konsisten dengan repository
-    $request->merge(['id' => decrypt($id)]);
-    $result = $this->repo->startProcess('destroy', $request);
-    return $this->serveJSON($result);
+    $processor = new Processor(new Service());
+    if ($processor->setProcessor('destroy', ['id' => $id])) {
+        return response()->json(['success' => true, 'data' => $processor->output ?? null]);
+    }
+    return response()->json(['success' => false, 'message' => $processor->output ?? 'Proses gagal']);
 }
 
-public function destroys(Request $request)
-{
-    // Decrypt semua ID di controller
-    if ($request->has('id') && is_array($request->id)) {
-        $decryptedIds = [];
-        foreach ($request->id as $encryptedId) {
-            $decryptedIds[] = decrypt($encryptedId);
-        }
-        $request->merge(['id' => $decryptedIds]);
+
+    public function destroys(Request $request)
+    {
+        $result = $this->repo->startProcess('destroys', $request);
+        return $this->serveJSON($result);
     }
-    
-    $result = $this->repo->startProcess('destroys', $request);
-    return $this->serveJSON($result);
-}
 
 public function restore(Request $request, $id)
 {

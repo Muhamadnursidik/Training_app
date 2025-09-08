@@ -27,6 +27,7 @@ class Service extends BaseService
                     $query->where('keterangan', 'LIKE', '%' . $data['keterangan'] . '%');
                 }
             })
+            
             ->addColumn('id', function($query) {
                 return encrypt($query->id);
             })
@@ -131,36 +132,14 @@ class Service extends BaseService
         }
     }
 
-// Tambahkan ini untuk debugging
-public function destroy(array $data)
-{
-    try {
-        return DB::transaction(function() use ($data) {
-            $id = decrypt($data['id']);
+    public function destroy(array $id)
+    {
+        return DB::transaction(function () use ($id) {
             $model = Model::findOrFail($id);
-            
-            // Cek relasi yang mungkin menghalangi
-            Log::info('Model relations before delete:', [
-                'id' => $id,
-                'relations' => $model->toArray()
-            ]);
-            
-            $result = $model->delete();
-            
-            // Verifikasi apakah benar-benar terhapus
-            $stillExists = Model::find($id);
-            if ($stillExists) {
-                throw new \Exception('Data still exists after delete operation');
-            }
-            
-            Log::info('Data deleted successfully:', ['id' => $id]);
-            return $result;
+            $model->delete();
+            return true;
         });
-    } catch (\Exception $e) {
-        Log::error('Error deleting data: ' . $e->getMessage());
-        throw $e;
     }
-}
 
     public function destroys(array $data)
     {

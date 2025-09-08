@@ -97,20 +97,14 @@
             },
             {
                 id : 'delete',
-                url: '{{ route($module . '.destroy', ['id' => '__grid_doc__']) }}'
-            },
-            {
-                id: 'restore',
-                title: 'Restore Deleted',
-                url: '{{ route($module . '.restore', ['id' => '__grid_doc__']) }}',
-                className: 'btn btn-xs btn-outline-success btn-restore p-1 pb-1',
-                icon: '<i class="bx bx-rotate-left bx-xs"></i>',
+                url: '{{ route($module . '.destroy', ['id' => '__grid_doc__']) }}',
+                method: 'destroy',
             }
         ],
         columns: [
             {data: 'tanggal', name:'tanggal'},
             {data: 'keterangan', name:'keterangan'},
-            {data: 'action', className: 'text-center'}
+            {data: 'action', className: 'text-center'},
         ],
         onDraw : function() {
             initModalAjax('.btn-edit');
@@ -123,7 +117,7 @@
             if(_import != '1'){
                 $('.btn-import').remove()
             }
-            initModalAjax('.btn-add, .btn-import');
+            initModalAjax('.btn-add, .btn-import'); 
         }
     });
 </script>
@@ -132,5 +126,6 @@
         initPage();
         initDatatableTools($('#main-table'), oTable);
     })
+    
 </script>
 @endpush
