@@ -132,14 +132,16 @@ class Service extends BaseService
         }
     }
 
-    public function destroy(array $id)
-    {
-        return DB::transaction(function () use ($id) {
-            $model = Model::findOrFail($id);
-            $model->delete();
-            return true;
-        });
+public function destroy(array $data)
+{
+    $model = Model::withTrashed()->find($data['id']); 
+    if (!$model) {
+        throw new \Exception("Data dengan ID {$data['id']} tidak ditemukan");
     }
+
+    $model->forceDelete();
+    return $model;
+}
 
     public function destroys(array $data)
     {

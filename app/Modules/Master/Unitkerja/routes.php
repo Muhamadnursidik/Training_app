@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Facades\Route;
+
 Route::resource('unitkerja', '\App\Modules\Master\Unitkerja\Controller', [
     'names' => 'unitkerja'
 ]);
