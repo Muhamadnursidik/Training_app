@@ -71,86 +71,102 @@
 @push('plugin-scripts')
 <script type="text/javascript">
     var oTable = $('#main-table').myDataTable({
-    buttons: [
-        {
-            id: 'add',
-            url: '{{ route($module . ".create") }}',
-            modal: '#modal-md',
-            className: 'btn btn-primary btn-add',
-        },
-        {
-            id: 'import',
-            title: 'Import Data',
-            url: '{{ route($module . ".import") }}',
-            modal: '#modal-md',
-            className: 'btn btn-warning btn-import ms-2',
-            icon: '<i data-feather="upload" class="feather-16"></i>',
-            toggle: 'modal'
-        },
-        {
-            id: 'export-pdf',
-            title: 'Export PDF',
-            url: '{{ route($module . ".export", ["type" => "pdf"]) }}',
-            className: 'btn btn-danger ms-2',
-            icon: '<i data-feather="file-text" class="feather-16"></i>',
-            action: function () {
-                window.location.href = this.url;
+        buttons: [
+            {
+                id: 'add',
+                url: '{{ route($module . ".create") }}',
+                modal: '#modal-md',
+                className: 'btn btn-primary btn-add',
+            },
+            {
+                id: 'import',
+                title: 'Import Data',
+                url: '{{ route($module . ".import") }}',
+                modal: '#modal-md',
+                className: 'btn btn-warning btn-import ms-2',
+                icon: '<i data-feather="upload" class="feather-16"></i>',
+                toggle: 'modal'
+            },
+            {
+                id: 'export-pdf',
+                title: 'Export PDF',
+                url: '{{ route($module . ".export", ["type" => "pdf"]) }}',
+                className: 'btn btn-danger ms-2',
+                icon: '<i data-feather="file-text" class="feather-16"></i>',
+                action: function () {
+                    window.location.href = this.url;
+                }
+            },
+            {
+                id: 'export-excel',
+                title: 'Export Excel',
+                url: '{{ route($module . ".export", ["type" => "excel"]) }}',
+                className: 'btn btn-success ms-2',
+                icon: '<i data-feather="file" class="feather-16"></i>',
+                action: function () {
+                    window.location.href = this.url;
+                }
+            },
+            {
+                id: 'export-word',
+                title: 'Export Word',
+                url: '{{ route($module . ".export", ["type" => "word"]) }}',
+                className: 'btn btn-info ms-2',
+                icon: '<i data-feather="file" class="feather-16"></i>',
+                action: function () {
+                    window.location.href = this.url;
+                }
             }
-        },
-        {
-            id: 'export-excel',
-            title: 'Export Excel',
-            url: '{{ route($module . ".export", ["type" => "excel"]) }}',
-            className: 'btn btn-success ms-2',
-            icon: '<i data-feather="file" class="feather-16"></i>',
-            action: function () {
-                window.location.href = this.url;
+        ],
+        actions: [
+            {
+                id : 'edit',
+                url: '{{ route($module . ".edit", ["dataliburnasional" => "__grid_doc__"]) }}',
+                modal: '#modal-md',
+                className: "btn btn-light p-1 pb-1 btn-edit"
+            },
+            {
+                id : 'delete',
+                url: '{{ route($module . ".destroy", ["id" => "__grid_doc__"]) }}',
+                method: 'delete',
+                // className: "btn btn-light p-1 pb-1 btn-delete"
+            },
+            {
+                id: 'restore',
+                title: 'Restore Deleted',
+                url: '{{ route($module . ".restore", ["id" => "__grid_doc__"]) }}',
+                className: 'btn btn-xs btn-outline-success btn-restore p-1 pb-1',
+                icon: '<i class="bx bx-rotate-left bx-xs"></i>',
             }
+        ],
+        columns: [
+            {data: 'tanggal', name:'tanggal'},
+            {data: 'keterangan', name:'keterangan'},
+            {data: 'action', className: 'text-center'},
+        ],
+        onDraw : function() {
+            initModalAjax('.btn-edit');
+            initDatatableAction($(this), function(){
+              oTable.reload();
+            });
         },
-        {
-            id: 'export-word',
-            title: 'Export Word',
-            url: '{{ route($module . ".export", ["type" => "word"]) }}',
-            className: 'btn btn-info ms-2',
-            icon: '<i data-feather="file" class="feather-16"></i>',
-            action: function () {
-                window.location.href = this.url;
+        onComplete: function() {
+            var _import = '{{ auth()->user()->can($module.".import") }}';
+            if(_import != '1'){
+                $('.btn-import').remove()
             }
-        }
-    ],
-    actions: [
-        {
-            id : 'edit',
-            url: '{{ route($module . ".edit", ["dataliburnasional" => "__grid_doc__"]) }}',
-            modal: '#modal-md',
-            className: "btn btn-light p-1 pb-1 btn-edit"
+            initModalAjax('.btn-add, .btn-import'); 
         },
-        {
-            id : 'delete',
-            url: '{{ route($module . ".destroy", ["id" => "__grid_doc__"]) }}',
-            method: 'delete',
-        }
-    ],
-    columns: [
-        {data: 'tanggal', name:'tanggal'},
-        {data: 'keterangan', name:'keterangan'},
-        {data: 'action', className: 'text-center'},
-    ],
-    onDraw : function() {
-        initModalAjax('.btn-edit');
-        initDatatableAction($(this), function(){
-          oTable.reload();
-        });
-    },
-    onComplete: function() {
-        var _import = '{{ auth()->user()->can($module.".import") }}';
-        if(_import != '1'){
-            $('.btn-import').remove()
-        }
-        initModalAjax('.btn-add, .btn-import'); 
-    }
-});
+        customRow: function(row, data) {
+            $('td:eq(2)', row).find('.btn-restore').hide();
 
+            if (data.deleted_at != null) {
+                $('td:eq(2)', row).find('.btn-edit').hide();
+                $('td:eq(2)', row).find('.btn-delete').hide();
+                $('td:eq(2)', row).find('.btn-restore').show();
+            }
+        }
+    });
 </script>
 <script type="text/javascript">
     $(function(){

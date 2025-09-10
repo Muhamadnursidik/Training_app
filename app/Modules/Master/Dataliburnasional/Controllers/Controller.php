@@ -142,27 +142,47 @@ class Controller extends BaseModule
         }
     }
 
-    public function destroy($id)
+public function destroy($id)
+{
+    try {
+        $service = new Service();
+        $result = $service->destroy(['id' => $id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus',
+            'data'    => $result
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+    // public function destroys(Request $request)
+    // {
+    //     $result = $this->repo->startProcess('destroys', $request);
+    //     return $this->serveJSON($result);
+    // }
+
+    public function restore($id)
     {
-        $processor = new Processor(new Service());
-        if ($processor->setProcessor('destroy', ['id' => $id])) {
-            return response()->json(['success' => true, 'data' => $processor->output ?? null]);
+        try {
+            $service = new Service();
+            $result = $service->restore(['id' => $id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil direstore',
+                'data'    => $result
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-        return response()->json(['success' => false, 'message' => $processor->output ?? 'Proses gagal']);
-    }
-
-    public function destroys(Request $request)
-    {
-        $result = $this->repo->startProcess('destroys', $request);
-        return $this->serveJSON($result);
-    }
-
-    public function restore(Request $request, $id)
-    {
-        // Konsisten dengan destroy
-        $request->merge(['id' => decrypt($id)]);
-        $result = $this->repo->startProcess('restore', $request);
-        return $this->serveJSON($result);
     }
 
     public function export(Request $request, $type = null)

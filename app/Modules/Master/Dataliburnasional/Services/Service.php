@@ -134,48 +134,48 @@ class Service extends BaseService
 
 public function destroy(array $data)
 {
-    $model = Model::withTrashed()->find($data['id']); 
+    $id = is_numeric($data['id']) ? $data['id'] : decrypt($data['id']);
+    $model = Model::find($id);
+
     if (!$model) {
-        throw new \Exception("Data dengan ID {$data['id']} tidak ditemukan");
+        throw new \Exception("Data dengan ID {$id} tidak ditemukan");
     }
 
-    $model->forceDelete();
+    $model->delete();
+
     return $model;
 }
 
-    public function destroys(array $data)
-    {
-        try {
-            $ids = [];
-            foreach ($data['id'] as $value) {
-                $ids[] = decrypt($value);
-            }
+    // public function destroys(array $data)
+    // {
+    //     try {
+    //         $ids = [];
+    //         foreach ($data['id'] as $value) {
+    //             $ids[] = decrypt($value);
+    //         }
 
-            return DB::transaction(function() use ($ids) {
-                $result = Model::whereIn('id', $ids)->delete();
-                Log::info('Batch delete completed:', ['count' => $result]);
-                return $result;
-            });
-        } catch (\Exception $e) {
-            Log::error('Error batch deleting data: ' . $e->getMessage());
-            throw $e;
-        }
-    }
+    //         return DB::transaction(function() use ($ids) {
+    //             $result = Model::whereIn('id', $ids)->delete();
+    //             Log::info('Batch delete completed:', ['count' => $result]);
+    //             return $result;
+    //         });
+    //     } catch (\Exception $e) {
+    //         Log::error('Error batch deleting data: ' . $e->getMessage());
+    //         throw $e;
+    //     }
+    // }
 
     public function restore(array $data)
     {
-        try {
-            return DB::transaction(function () use ($data) {
-                $id = decrypt($data['id']);
-                $model = Model::withTrashed()->findOrFail($id);
-                
-                $result = $model->restore();
-                Log::info('Data restored successfully:', ['id' => $id]);
-                return $result;
-            });
-        } catch (\Exception $e) {
-            Log::error('Error restoring data: ' . $e->getMessage());
-            throw $e;
+        $id = is_numeric($data['id']) ? $data['id'] : decrypt($data['id']);
+        $model = Model::withTrashed()->find($id);
+
+        if (!$model) {
+            throw new \Exception("Data dengan ID {$id} tidak ditemukan");
         }
+
+        $model->restore();
+
+        return $model;
     }
 }
