@@ -18,9 +18,18 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group row mb-1">
-                                                <label for="tanggal" class="col-sm-3 col-form-label">{{ __('Tanggal') }}</label>
+                                                <label for="tanggal" class="col-sm-3 col-form-label">{{ __('Tahun') }}</label>
                                                 <div class="col-sm-9">
-                                                    <input type="date" class="form-control" name="tanggal" id="tanggal">
+                                                    <select class="form-control" name="tanggal" id="tanggal">
+                                                        @php
+                                                            $start = date('Y') - 5;
+                                                            $end = date('Y') + 5;
+                                                        @endphp
+                                                        <option value="">{{ __('- Pilih Tahun -') }}</option>
+                                                        @for($y = $start; $y <= $end; $y++)
+                                                            <option value="{{ $y }}">{{ $y }}</option>
+                                                        @endfor
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -86,36 +95,6 @@
                 className: 'btn btn-warning btn-import ms-2',
                 icon: '<i data-feather="upload" class="feather-16"></i>',
                 toggle: 'modal'
-            },
-            {
-                id: 'export-pdf',
-                title: 'Export PDF',
-                url: '{{ route($module . ".export", ["type" => "pdf"]) }}',
-                className: 'btn btn-danger ms-2',
-                icon: '<i data-feather="file-text" class="feather-16"></i>',
-                action: function () {
-                    window.location.href = this.url;
-                }
-            },
-            {
-                id: 'export-excel',
-                title: 'Export Excel',
-                url: '{{ route($module . ".export", ["type" => "excel"]) }}',
-                className: 'btn btn-success ms-2',
-                icon: '<i data-feather="file" class="feather-16"></i>',
-                action: function () {
-                    window.location.href = this.url;
-                }
-            },
-            {
-                id: 'export-word',
-                title: 'Export Word',
-                url: '{{ route($module . ".export", ["type" => "word"]) }}',
-                className: 'btn btn-info ms-2',
-                icon: '<i data-feather="file" class="feather-16"></i>',
-                action: function () {
-                    window.location.href = this.url;
-                }
             }
         ],
         actions: [

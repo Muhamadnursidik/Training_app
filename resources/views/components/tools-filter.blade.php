@@ -10,5 +10,9 @@
     <div class="dropdown-menu dropdown-menu-end">
         <a href="javascript:void(0);" class="dropdown-item reload-table"><i class="bx bx-refresh bx-xs" data-feather="refresh-cw"></i> {{ __('Muat ulang') }}</a>
         <a href="javascript:void(0);" class="dropdown-item reset-filter"><i class="bx bx-reset bx-xs" data-feather="rotate-ccw"></i> {{ __('Reset Filter') }}</a>
+        <div class="dropdown-divider"></div>
+        <a href="{{ route($module . '.export', ['type' => 'pdf']) }}" class="dropdown-item"><i class="bx bx-file bx-xs text-danger"></i> Export PDF</a>
+        <a href="{{ route($module . '.export', ['type' => 'excel']) }}" class="dropdown-item"><i class="bx bx-spreadsheet bx-xs text-success"></i> Export Excel</a>
+        <a href="{{ route($module . '.export', ['type' => 'word']) }}" class="dropdown-item"><i class="bx bx-file bx-xs text-info"></i> Export Word</a>
     </div>
 </div>
