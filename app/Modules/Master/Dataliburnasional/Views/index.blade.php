@@ -13,6 +13,11 @@
                 <div class="row">
                     <div class="col">
                         {{ Form::open(['id' => 'form-filter', 'autocomplete' => 'off']) }}
+                            @push('tools-filter')
+                                <a href="{{ route($module . '.export', ['type' => 'pdf']) }}" class="dropdown-item"><i class="bx bx-file bx-xs text-danger"></i> Export PDF</a>
+                                <a href="{{ route($module . '.export', ['type' => 'excel']) }}" class="dropdown-item"><i class="bx bx-spreadsheet bx-xs text-success"></i> Export Excel</a>
+                                <a href="{{ route($module . '.export', ['type' => 'word']) }}" class="dropdown-item"><i class="bx bx-file bx-xs text-info"></i> Export Word</a>
+                            @endpush
                             <div class="row">
                                 <div class="col-md-10">
                                     <div class="row">

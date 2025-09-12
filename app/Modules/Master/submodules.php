@@ -4,4 +4,5 @@ return [
     'Unitkerja',
     'Tipeunitkerja',
     'Dataliburnasional',
+    'Rencanaproject',
 ];
