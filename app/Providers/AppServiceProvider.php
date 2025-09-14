@@ -37,12 +37,12 @@ class AppServiceProvider extends ServiceProvider
         config(['app.locale' => 'id']);
         Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
-        
+
         Schema::defaultStringLength(191);
-        
+
         /*tambah ip address*/
         $agent = new Agent();
-        
+
         Activity::saving(function (Activity $activity) use($agent){
             $activity->properties = $activity->properties
             ->put('ip_address', request()->ip())
@@ -87,6 +87,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('Illuminate\Routing\ResourceRegistrar', function () use ($registrar) {
             return $registrar;
         });
-        
+
     }
 }

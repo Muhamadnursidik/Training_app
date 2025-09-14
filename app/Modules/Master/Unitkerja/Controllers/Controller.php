@@ -56,7 +56,7 @@ class Controller extends BaseModule
         $data = Service::get(decrypt($id));
         $unitkerja = UnitkerjaService::dropdown();
         unset($unitkerja['']);
-        
+
         return $this->serveView([
             'data' => $data,
             'options_tipe_unit_kerja' => TipeunitkerjaService::dropdown(),
@@ -91,7 +91,7 @@ class Controller extends BaseModule
         $result = $this->repo->startProcess('restore', $request);
         return $this->serveJSON($result);
     }
-    
+
     public function download(Request $request)
     {
         $result = $this->repo->startProcess('download', $request);

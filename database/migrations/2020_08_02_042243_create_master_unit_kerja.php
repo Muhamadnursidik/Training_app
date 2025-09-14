@@ -20,7 +20,6 @@ class CreateMasterUnitKerja extends Migration
             $table->boolean('status');
             $table->softDeletes();
             $table->timestamps();
-            
         });
     }
 
@@ -32,5 +31,5 @@ class CreateMasterUnitKerja extends Migration
     public function down()
     {
         Schema::dropIfExists('master_unit_kerja');
-    }
+    }   
 }

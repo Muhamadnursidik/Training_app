@@ -22,7 +22,7 @@
                                                 <div class="col-sm-9">
                                                     <input type="text" class="form-control" name="name" id="name">
                                                 </div>
-                                            </div>
+                                            </div>  
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group row mb-1">
@@ -48,7 +48,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-primary w-100 btn-filter"> 
+                                    <button type="submit" class="btn btn-primary w-100 btn-filter">
                                         <i class="bx bx-filter bx-xs align-middle"></i>
                                         Filters
                                     </button>

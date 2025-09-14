@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <div class="card overflow-hidden">
                 <div class="card-body">
-                    @include('components.information')
+                    @include('components.mini-dashboard')
                 </div>
             </div>
         </div>

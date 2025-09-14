@@ -3,4 +3,6 @@
 return [
     'Unitkerja',
     'Tipeunitkerja',
+    'DataMitra',
+    'DataProject',
 ];
