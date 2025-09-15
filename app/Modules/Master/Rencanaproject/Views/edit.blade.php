@@ -3,7 +3,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
-{{ Form::model($data, ['route' => ['rencanaproject.update', encrypt($data->id)], 'method' => 'PUT', 'id' => 'form-update', 'class' => 'form-submit']) }}
+{{ Form::model($data, ['id' => 'form-update', 'route' => [$module . '.update', encrypt($data->id)], 'method' => 'PUT', 'autocomplete' => 'off']) }}
 <div class="modal-body">
     <div class="row">
         <!-- Kode Project -->

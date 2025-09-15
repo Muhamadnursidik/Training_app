@@ -94,9 +94,9 @@ class Service extends BaseService
     /**
      * Ambil data berdasarkan ID
      */
-    public function get(array $data)
+    public function get($id)
     {
-        return Model::with(['parent', 'children'])->findOrFail($data['id']);
+        return Model::with(['parent'])->findOrFail($id);
     }
 
     /**

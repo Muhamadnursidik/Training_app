@@ -6,11 +6,11 @@ use App\Modules\Master\Rencanaproject\Models\Model;
 use App\Modules\Master\Rencanaproject\Repositories\Repository;
 use App\Modules\Master\Rencanaproject\Services\Service;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
-use Carbon\Carbon;
 
 class Controller extends BaseModule
 {
@@ -39,11 +39,11 @@ class Controller extends BaseModule
 
     public function create()
     {
-        $parents =Model::select('id', 'aktivitas', 'level')->orderBy('level')->orderBy('aktivitas')->get()->map(function($item) {
+        $parents = Model::select('id', 'aktivitas', 'level')->orderBy('level')->orderBy('aktivitas')->get()->map(function ($item) {
             return [
-                'id'   => $item->id,
+                'id'    => $item->id,
                 'level' => $item->level,
-                'text' => str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $item->level - 1) . $item->aktivitas
+                'text'  => str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $item->level - 1) . $item->aktivitas,
             ];
         })->toArray();
         return $this->serveView(compact('parents'));
@@ -55,33 +55,41 @@ class Controller extends BaseModule
             $service = new Service();
             $result  = $service->store($request->all());
 
-            return response()->json([
-                'success' => true,
-                'data'    => $result,
-            ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data berhasil disimpan',
+                    'data'    => $result,
+                ]);
+            }
+
+            return redirect()
+                ->route($this->module . '.index')
+                ->with('success', 'Data berhasil disimpan');
+
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-    /**
-     * Tampilkan form edit
-     */
     public function edit($id)
     {
-        $data = $this->service->get(['id' => decrypt($id)]);
-        $projects = Model::all(); // Ambil dari tabel projects
-        $parents = $this->service->getParentOptions($data->id);
-        
-        return $this->serveView(['data' => $data, 'projects' => $projects, 'parents' => $parents]);
+        $data = $this->service->get($id);
+        return $this->serveView([
+            'data' => $data,
+        ]);
     }
 
-    /**
-     * Update data
-     */
     public function update(Request $request, $id)
     {
         $request->merge(['id' => decrypt($id)]);
@@ -89,9 +97,6 @@ class Controller extends BaseModule
         return $this->serveJSON($result);
     }
 
-    /**
-     * Hapus data
-     */
     public function destroy(Request $request, $id)
     {
         $request->merge(['id' => decrypt($id)]);
@@ -99,18 +104,12 @@ class Controller extends BaseModule
         return $this->serveJSON($result);
     }
 
-    /**
-     * Hapus multiple data
-     */
     public function destroys(Request $request)
     {
         $result = $this->repo->startProcess('destroys', $request);
         return $this->serveJSON($result);
     }
 
-    /**
-     * Restore data yang telah dihapus
-     */
     public function restore(Request $request, $id)
     {
         $request->merge(['id' => decrypt($id)]);
@@ -118,9 +117,6 @@ class Controller extends BaseModule
         return $this->serveJSON($result);
     }
 
-    /**
-     * Export data ke berbagai format
-     */
     public function export(Request $request, $type = null)
     {
         try {
@@ -163,48 +159,45 @@ class Controller extends BaseModule
         }
     }
 
-    /**
-     * Halaman import
-     */
     public function import()
     {
         return $this->serveView();
     }
 
-    /**
-     * Proses import dari file Excel
-     */
     public function processImport(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls|max:2048'
+            'file' => 'required|mimes:xlsx,xls|max:2048',
         ]);
 
         try {
-            $file = $request->file('file');
-            $reader = new XlsxReader();
+            $file        = $request->file('file');
+            $reader      = new XlsxReader();
             $spreadsheet = $reader->load($file->getPathname());
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
+            $worksheet   = $spreadsheet->getActiveSheet();
+            $rows        = $worksheet->toArray();
 
             // Skip header row
             array_shift($rows);
 
             $imported = 0;
-            $errors = [];
+            $errors   = [];
 
             foreach ($rows as $index => $row) {
                 try {
-                    if (empty($row[1]) || empty($row[2])) continue; // Skip empty rows
+                    if (empty($row[1]) || empty($row[2])) {
+                        continue;
+                    }
+                    // Skip empty rows
 
                     $data = [
-                        'kode_project' => $row[1],
-                        'aktivitas' => $row[2],
-                        'level' => $row[3] ?? 1,
-                        'bobot' => $row[4] ?? 0,
+                        'kode_project'  => $row[1],
+                        'aktivitas'     => $row[2],
+                        'level'         => $row[3] ?? 1,
+                        'bobot'         => $row[4] ?? 0,
                         'tanggal_mulai' => $row[5] ? Carbon::parse($row[5])->format('Y-m-d') : null,
                         'tanggal_akhir' => $row[6] ? Carbon::parse($row[6])->format('Y-m-d') : null,
-                        'minggu_ke' => $row[7] ?? null,
+                        'minggu_ke'     => $row[7] ?? null,
                     ];
 
                     $this->service->store($data);
@@ -215,10 +208,10 @@ class Controller extends BaseModule
             }
 
             $result = [
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => "Berhasil import {$imported} data",
                 'imported' => $imported,
-                'errors' => $errors
+                'errors'   => $errors,
             ];
 
             return $this->serveJSON($result);
@@ -227,68 +220,56 @@ class Controller extends BaseModule
         }
     }
 
-    /**
-     * Generate dropdown aktivitas untuk select2
-     */
     public function generatedropdownaktivitas(Request $request)
     {
         $search = $request->get('search');
-        $data = Model::select('id', 'aktivitas as text')
-                    ->when($search, function($query, $search) {
-                        return $query->where('aktivitas', 'like', '%' . $search . '%');
-                    })
-                    ->orderBy('aktivitas')
-                    ->limit(20)
-                    ->get();
+        $data   = Model::select('id', 'aktivitas as text')
+            ->when($search, function ($query, $search) {
+                return $query->where('aktivitas', 'like', '%' . $search . '%');
+            })
+            ->orderBy('aktivitas')
+            ->limit(20)
+            ->get();
 
         return response()->json(['results' => $data]);
     }
 
-    /**
-     * Generate dropdown parent untuk select2
-     */
     public function generatedropdownparent(Request $request)
     {
-        $search = $request->get('search');
+        $search    = $request->get('search');
         $excludeId = $request->get('exclude_id');
-        
+
         $data = Model::select('id', 'aktivitas as text')
-                    ->when($search, function($query, $search) {
-                        return $query->where('aktivitas', 'like', '%' . $search . '%');
-                    })
-                    ->when($excludeId, function($query, $excludeId) {
-                        return $query->where('id', '!=', $excludeId);
-                    })
-                    ->orderBy('aktivitas')
-                    ->limit(20)
-                    ->get();
+            ->when($search, function ($query, $search) {
+                return $query->where('aktivitas', 'like', '%' . $search . '%');
+            })
+            ->when($excludeId, function ($query, $excludeId) {
+                return $query->where('id', '!=', $excludeId);
+            })
+            ->orderBy('aktivitas')
+            ->limit(20)
+            ->get();
 
         return response()->json(['results' => $data]);
     }
 
-    /**
-     * Export ke PDF
-     */
     private function exportPDF($data, $request = null)
     {
         $pdf = PDF::loadView('exports.rencana-project-pdf', [
-            'data' => $data,
-            'filters' => $request ? $request->all() : []
+            'data'    => $data,
+            'filters' => $request ? $request->all() : [],
         ]);
-        
+
         $pdf->setPaper('A4', 'landscape');
         $filename = 'rencana-project-' . now()->format('Y-m-d-H-i-s') . '.pdf';
-        
+
         return $pdf->download($filename);
     }
 
-    /**
-     * Export ke Excel
-     */
     private function exportExcel($data, $request = null)
     {
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheet       = $spreadsheet->getActiveSheet();
 
         // Set header
         $headers = [
@@ -300,7 +281,7 @@ class Controller extends BaseModule
             'F1' => 'Bobot (%)',
             'G1' => 'Tanggal Mulai',
             'H1' => 'Tanggal Akhir',
-            'I1' => 'Minggu Ke'
+            'I1' => 'Minggu Ke',
         ];
 
         foreach ($headers as $cell => $value) {
@@ -328,7 +309,7 @@ class Controller extends BaseModule
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $writer = new Xlsx($spreadsheet);
+        $writer   = new Xlsx($spreadsheet);
         $filename = 'rencana-project-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($tempFile);
@@ -336,9 +317,6 @@ class Controller extends BaseModule
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 
-    /**
-     * Export ke Word
-     */
     private function exportWord($data, $request = null)
     {
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
@@ -349,12 +327,12 @@ class Controller extends BaseModule
         $section = $phpWord->addSection();
 
         // Title
-        $section->addText('Laporan Rencana Project', 
-            ['bold' => true, 'size' => 16], 
+        $section->addText('Laporan Rencana Project',
+            ['bold' => true, 'size' => 16],
             ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]
         );
-        $section->addText('Laporan Lengkap Data Rencana Project', 
-            ['size' => 12, 'color' => '666666'], 
+        $section->addText('Laporan Lengkap Data Rencana Project',
+            ['size' => 12, 'color' => '666666'],
             ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]
         );
         $section->addTextBreak(1);
@@ -366,16 +344,16 @@ class Controller extends BaseModule
 
         // Table
         $tableStyle = [
-            'borderSize' => 6,
+            'borderSize'  => 6,
             'borderColor' => '999999',
-            'cellMargin' => 80,
-            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            'cellMargin'  => 80,
+            'alignment'   => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
         ];
         $firstRowStyle = ['bgColor' => 'DDDDDD'];
         $phpWord->addTableStyle('DataTable', $tableStyle, $firstRowStyle);
 
         $table = $section->addTable('DataTable');
-        
+
         // Header
         $table->addRow();
         $table->addCell(800)->addText('No', ['bold' => true]);
