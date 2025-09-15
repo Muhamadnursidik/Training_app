@@ -3,7 +3,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
-{{ Form::open(['route' => 'rencanaproject.store', 'id' => 'form-store', 'class' => 'form-submit']) }}
+{{ Form::open(['id' => 'form-store', 'route' => $module . '.store', 'method' => 'post', 'autocomplete' => 'off',]) }}
 <div class="modal-body">
     <div class="row">
         <!-- Kode Project -->
@@ -37,12 +37,14 @@
                 <label for="parent_id" class="form-label">{{ __('Parent Aktivitas') }}</label>
                 <select name="parent_id" id="parent_id" class="form-control select2">
                     <option value="">{{ __('- Root Level (Tanpa Parent) -') }}</option>
-                    @if(isset($parents))
+                    @if(isset($parents) && count($parents) > 0)
                         @foreach($parents as $parent)
                             <option value="{{ $parent['id'] }}" data-level="{{ $parent['level'] }}">
                                 {!! $parent['text'] !!}
                             </option>
                         @endforeach
+                    @else
+                        <option disabled>{{ __('Tidak ada data parent tersedia') }}</option>
                     @endif
                 </select>
                 <small class="text-muted">Pilih parent untuk membuat sub-aktivitas</small>
@@ -90,6 +92,7 @@
 </div>
 {!! Form::close() !!}
 
+@push('plugin-scripts')
 <script>
 $(document).ready(function() {
     // Initialize Select2 for parent dropdown
@@ -136,3 +139,42 @@ $(document).ready(function() {
     }
 });
 </script>
+<script type="text/javascript">
+$(function(){
+    $('#form-store').on('submit', function(e){
+        e.preventDefault();
+
+        var form = $(this);
+
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            data: form.serialize(),
+            success: function(res) {
+                if (res.success) {
+                    $('#modal-md').modal('hide');
+
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: res.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        oTable.reload();
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: xhr.responseJSON?.message ?? 'Terjadi kesalahan',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+});
+</script>
+@endpush

@@ -39,7 +39,14 @@ class Controller extends BaseModule
 
     public function create()
     {
-        return $this->serveView();
+        $parents =Model::select('id', 'aktivitas', 'level')->orderBy('level')->orderBy('aktivitas')->get()->map(function($item) {
+            return [
+                'id'   => $item->id,
+                'level' => $item->level,
+                'text' => str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $item->level - 1) . $item->aktivitas
+            ];
+        })->toArray();
+        return $this->serveView(compact('parents'));
     }
 
     public function store(Request $request)

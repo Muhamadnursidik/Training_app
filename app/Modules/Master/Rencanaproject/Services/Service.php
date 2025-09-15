@@ -72,22 +72,16 @@ class Service extends BaseService
      */
     public function store(array $data)
     {
-        // Auto generate minggu_ke jika tidak diisi
         if (empty($data['minggu_ke']) && ! empty($data['tanggal_mulai'])) {
             $data['minggu_ke'] = Carbon::parse($data['tanggal_mulai'])->weekOfYear;
         }
 
-        // Validasi parent_id tidak boleh sama dengan dirinya sendiri
-        if (! empty($data['parent_id']) && $data['parent_id'] == $data['id']) {
-            throw new \Exception('Parent tidak boleh sama dengan data itu sendiri');
-        }
-
-        // Validasi level berdasarkan parent
         if (! empty($data['parent_id'])) {
             $parent = Model::find($data['parent_id']);
-            if ($parent) {
-                $data['level'] = $parent->level + 1;
+            if (! $parent) {
+                throw new \Exception('Parent yang dipilih tidak ditemukan.');
             }
+            $data['level'] = $parent->level + 1;
         } else {
             $data['level'] = 1; // Root level
         }
