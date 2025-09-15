@@ -25,55 +25,39 @@ class Controller extends BaseModule
         parent::__construct();
     }
 
-    /**
-     * Tampilkan halaman utama
-     */
     public function index()
     {
         activity('Akses menu')->log('Akses menu ' . $this->pageTitle);
-        
-        $projects = Model::all();
-        
-        return $this->serveView(compact('projects'));
+        return $this->serveView();
     }
 
-    /**
-     * Data untuk DataTables
-     */
     public function data(Request $request)
     {
         $result = $this->repo->startProcess('data', $request);
         return $this->serveJSON($result);
     }
 
-    /**
-     * Tampilkan form create
-     */
     public function create()
     {
-        // Data untuk dropdown
-        $projects = Model::all(); // Ambil dari tabel projects
-        $parents = $this->service->getParentOptions();
-        
-        return $this->serveView(['projects' => $projects, 'parents' => $parents]);
+        return $this->serveView();
     }
 
-    /**
-     * Simpan data baru
-     */
     public function store(Request $request)
     {
-        $result = $this->repo->startProcess('store', $request);
-        return $this->serveJSON($result);
-    }
+        try {
+            $service = new Service();
+            $result  = $service->store($request->all());
 
-    /**
-     * Tampilkan detail data
-     */
-    public function show($id)
-    {
-        $data = $this->service->get(['id' => decrypt($id)]);
-        return $this->serveView(['data' => $data]);
+            return response()->json([
+                'success' => true,
+                'data'    => $result,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

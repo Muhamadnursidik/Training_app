@@ -3,9 +3,10 @@ namespace App\Modules\Master\Dataliburnasional;
 
 use App\Bases\BaseService;
 use App\Modules\Master\Dataliburnasional\Model;
-use DataTables;
+// use DataTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
 
 class Service extends BaseService
 {

@@ -111,22 +111,6 @@
 <div class="row">
     <div class="col">
         <div class="card card-small mb-4">
-            {{-- <div class="card-header border-bottom">
-                <h6 class="m-0">{{ __('Data Rencana Project') }}</h6>
-                <div class="block-options">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-success" onclick="exportData('excel')">
-                            <i class="bx bx-download"></i> Excel
-                        </button>
-                        <button type="button" class="btn btn-sm btn-info" onclick="exportData('pdf')">
-                            <i class="bx bx-download"></i> PDF
-                        </button>
-                        <button type="button" class="btn btn-sm btn-primary" onclick="exportData('word')">
-                            <i class="bx bx-download"></i> Word
-                        </button>
-                    </div>
-                </div>
-            </div> --}}
             <div class="card-body">
                 @include('components.datatables', [
                     'id' => 'main-table',
@@ -148,10 +132,6 @@
     </div>
 </div>
 @endsection
-
-<!-- Modal -->
-<div class="modal fade" id="modal-md" tabindex="-1" aria-hidden="true"></div>
-
 @include('assets.datatables')
 
 @push('plugin-scripts')
@@ -186,7 +166,7 @@
         ],
         columns: [
             {data: 'kode_project', name: 'kode_project'},
-            {data: 'aktivitas', name: 'aktivitas'},
+            {data: 'aktivitas', name: 'aktivitas', className: 'text-center'},
             {data: 'level', name: 'level'},
             {data: 'parent.aktivitas', name: 'parent.aktivitas'},
             {data: 'bobot', name: 'bobot'},
@@ -195,7 +175,6 @@
             {data: 'minggu_ke', name: 'minggu_ke'},
             {data: 'action', className: 'text-center', orderable: false, searchable: false},
         ],
-        order: [[0, 'asc'], [2, 'asc'], [5, 'asc']],
         onDraw: function() {
             initModalAjax('.btn-edit');
             initDatatableAction($(this), function(){
@@ -214,17 +193,6 @@
             }
         }
     });
-
-    function resetFilter() {
-        $('#form-filter')[0].reset();
-        oTable.reload();
-    }
-
-    function exportData(format) {
-        var formData = $('#form-filter').serialize();
-        var url = '{{ route($module . ".export") }}/' + format + '?' + formData;
-        window.open(url, '_blank');
-    }
 </script>
 
 <script type="text/javascript">

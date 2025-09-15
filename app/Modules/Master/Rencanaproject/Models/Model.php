@@ -35,7 +35,6 @@ class Model extends EloquentModel
         'minggu_ke' => 'integer'
     ];
 
-    // ✅ Tambahin scopeData biar kaya di Dataliburnasional
     public function scopeData($query)
     {
         return $query->select(
