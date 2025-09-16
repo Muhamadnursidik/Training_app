@@ -240,3 +240,30 @@
 		};
 	};
 }(jQuery));
+
+function initModalAjax(selector) {
+    $(selector).off('click').on('click', function (e) {
+        e.preventDefault();
+
+        let url = $(this).attr('href') ?? $(this).data('url');
+        let modalTarget = $(this).attr('modal') ?? $(this).data('bs-target') ?? '#modal-md';
+        let modal = $(modalTarget);
+        let content = modal.find('.modal-content');
+
+        // tampilkeun loading spinner
+        content.html('<div class="p-3 text-center"><i class="bx bx-loader-alt bx-spin fs-2"></i></div>');
+        modal.modal('show');
+
+        $.get(url)
+            .done(function (res) {
+                console.log('Response modal:', res);
+                content.html(res); // render form edit / create
+            })
+            .fail(function (xhr) {
+                console.error('Modal AJAX error:', xhr);
+                content.html('');
+                modal.modal('hide');
+                Swal.fire('Gagal', xhr.responseJSON?.message ?? 'Terjadi kesalahan saat mengambil data', 'error');
+            });
+    });
+}

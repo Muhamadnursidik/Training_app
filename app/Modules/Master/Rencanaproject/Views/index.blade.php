@@ -1,4 +1,3 @@
-{{-- resources/views/modules/master/rencanaproject/index.blade.php --}}
 @extends('layout.app')
 
 @section('content')

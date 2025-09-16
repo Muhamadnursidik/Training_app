@@ -6,6 +6,7 @@ use App\Modules\Master\Rencanaproject\Models\Model;
 // use DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class Service extends BaseService
@@ -91,17 +92,22 @@ class Service extends BaseService
         });
     }
 
-    /**
-     * Ambil data berdasarkan ID
-     */
     public function get($id)
     {
         return Model::with(['parent'])->findOrFail($id);
     }
 
-    /**
-     * Update data
-     */
+    // public static function get($id)
+    // {
+    //     try {
+    //         $query = Model::find($id);
+    //         return $query ?: false;
+    //     } catch (\Exception $e) {
+    //         Log::error('Error getting data: ' . $e->getMessage());
+    //         return false;
+    //     }
+    // }
+
     public function update(array $data)
     {
         $model = Model::findOrFail($data['id']);

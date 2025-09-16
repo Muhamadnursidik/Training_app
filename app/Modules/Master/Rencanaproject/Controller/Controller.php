@@ -84,7 +84,7 @@ class Controller extends BaseModule
 
     public function edit($id)
     {
-        $data = $this->service->get($id);
+        $data = $this->service->get(decrypt($id));
         return $this->serveView([
             'data' => $data,
         ]);
