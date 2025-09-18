@@ -3,14 +3,11 @@
 namespace App\Modules\Master\DataProject\Services;
 
 use App\Bases\BaseService;
-use Yajra\DataTables\Facades\DataTables;
 use App\Modules\Master\DataProject\Models\DataProject;
 use App\Modules\Master\DataMitra\Models\Datamitra;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
+
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 use Dompdf\Dompdf;
@@ -172,7 +169,6 @@ class Service extends BaseService
             $options = new Options();
             $options->set('defaultFont', 'DejaVu Sans');
             $options->setIsRemoteEnabled(true);
-            $options->setIsHtml5ParserEnabled(true);
 
             $dompdf = new Dompdf($options);
             $dompdf->loadHtml($html);
