@@ -7,12 +7,12 @@
     <div class="modal-body pb-2">
         <!-- Mitra -->
         <div class="form-group row p-0 mb-1">
-            <label for="kode_mitra" class="col-sm-3 col-form-label">
+            <label for="mitra_id" class="col-sm-3 col-form-label">
                 {{ __('Mitra') }}<sup class="text-danger">*</sup>
             </label>
             <div class="col-sm-9">
-                <select name="kode_mitra" id="kode_mitra" class="form-control" required>
-                    <option value="">-- Pilih Mitra --</option>
+                <select name="mitra_id" id="mitra_id" class="form-control" required>
+                    <option value="">Kode Mitra</option>
                     @foreach($options_mitra ?? [] as $key => $value)
                         <option value="{{ $key }}">{{ $value }}</option>
                     @endforeach
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Tanggal Mulai -->
-        <div class="form-group row p-0 mb-1">
+            <div class="form-group row p-0 mb-1">
             <label for="tanggal_mulai" class="col-sm-3 col-form-label">
                 {{ __('Tanggal Mulai') }}<sup class="text-danger">*</sup>
             </label>

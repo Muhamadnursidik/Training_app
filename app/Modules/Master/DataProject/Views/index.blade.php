@@ -35,9 +35,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group row mb-1">
-                                                <label for="kode_mitra" class="col-sm-3 col-form-label">{{ __('Kode Mitra') }}</label>
+                                                <label for="mitra_id" class="col-sm-3 col-form-label">{{ __('Kode Mitra') }}</label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" class="form-control" name="kode_mitra" id="kode_mitra">
+                                                    <input type="text" class="form-control" name="mitra_id" id="mitra_id">
                                                 </div>
                                             </div>
                                         </div>
@@ -129,7 +129,7 @@
         columns: [
             { data: 'kode_project', name: 'kode_project' },
             { data: 'nama_project', name: 'nama_project' },
-            { data: 'kode_mitra_display', name: 'kode_mitra' },
+            { data: 'kode_mitra_display', name: 'mitra_id' },
             { data: 'tanggal_mulai', name: 'tanggal_mulai' },
             { data: 'tanggal_akhir', name: 'tanggal_akhir' },
             { data: 'id', name: 'actions', orderable: false, searchable: false }
@@ -146,10 +146,6 @@
             });
         },
         onComplete: function() {
-            var _import = '{{ auth()->user()->can($module . ".import") }}';
-            if (_import != '1') {
-                $('.btn-import').remove()
-            }
             initModalAjax('.btn-add, .btn-import');
         }
     });

@@ -3,41 +3,38 @@
 namespace App\Modules\Master\DataMitra\Models;
 
 use App\Bases\BaseModel;
+use App\Modules\Master\DataProject\Models\DataProject;
 use Spatie\Activitylog\LogOptions;
 
 class Datamitra extends BaseModel
 {
-
     protected static $logFillable = true;
 
     protected $table = 'data_mitra';
-    protected $keyType = 'string';
     protected $primaryKey = 'id';
+    protected $keyType = 'string';
     public $incrementing = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'kode_mitra',
         'nama_mitra',
         'alamat',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
+    public function projects()
+    {
+        return $this->hasMany(DataProject::class, 'mitra_id', 'id');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logFillable()->useLogname('Master Data Mitra');
+        return LogOptions::defaults()
+            ->logFillable()
+            ->useLogName('Master Data Mitra');
     }
 }

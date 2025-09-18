@@ -3,9 +3,9 @@ namespace App\Modules\Master\DataProject\Controllers;
 
 use App\Bases\BaseModule;
 use Illuminate\Http\Request;
-use App\Modules\Master\DataProject\Models\DataProject;
 use App\Modules\Master\DataProject\Repositories\Repository;
-use Illuminate\Support\Facades\Log;
+use App\Modules\Master\DataProject\Models\DataProject;
+use App\Modules\Master\DataProject\Services\Service as ProjectService; // ✅ Pakai Service DataProject
 
 class Controller extends BaseModule
 {
@@ -28,36 +28,41 @@ class Controller extends BaseModule
     {
         $result = $this->repo->startProcess('data', $request);
         return $this->serveJSON($result);
-    }    public function create()
+    }
+
+    public function create()
     {
-        $options_mitra = $this->repo->getMitraOptions();
-        return $this->serveView(['options_mitra' => $options_mitra]);
+        
+
+        // ✅ Dropdown mitra untuk form create (kode_mitra)
+        $options_mitra = ProjectService::dropdown(true);
+
+        return $this->serveView([
+            'options_mitra' => $options_mitra
+        ]);
     }
 
     public function store(Request $request)
     {
-        try {
-            $result = $this->repo->startProcess('store', $request);
-            return $this->serveJSON($result);
-        } catch (\Exception $e) {
-            Log::error('DataProject Controller Store Exception:', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
+        $result = $this->repo->startProcess('store', $request);
+        return $this->serveJSON($result);
+    }
 
-            return $this->serveJSON([
-                'status' => false,
-                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
-            ], 500);
-        }
-    }    public function edit($id)
+    public function edit($id)
     {
         try {
             $decryptedId = decrypt($id);
+
+            // ✅ Ambil data project + relasi mitra
             $data = DataProject::with('mitra')->findOrFail($decryptedId);
-            $options_mitra = $this->repo->getMitraOptions();
-            return $this->serveView(['data' => $data, 'options_mitra' => $options_mitra]);
+
+            // ✅ Dropdown mitra untuk form edit (kode_mitra)
+            $options_mitra = ProjectService::dropdown(true);
+
+            return $this->serveView([
+                'data' => $data,
+                'options_mitra' => $options_mitra
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -70,7 +75,9 @@ class Controller extends BaseModule
     {
         try {
             $decryptedId = decrypt($id);
+
             $request->merge(['id' => $decryptedId]);
+
             $result = $this->repo->startProcess('update', $request);
             return $this->serveJSON($result);
         } catch (\Exception $e) {

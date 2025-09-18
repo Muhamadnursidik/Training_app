@@ -192,22 +192,17 @@ class Service extends BaseService
                 mkdir($logsDir, 0755, true);
             }
 
-            // DomPDF v3.1.0 Configuration
+            // DomPDF v2.0.3 Configuration
             $options = new Options();
             $options->set('defaultFont', 'DejaVu Sans');
-            $options->set('isRemoteEnabled', true);
-            $options->set('isHtml5ParserEnabled', true);
-            $options->set('isPhpEnabled', false);
-            $options->set('isFontSubsettingEnabled', true);
-            $options->set('defaultPaperSize', 'A4');
-            $options->set('defaultPaperOrientation', 'portrait');
-            $options->set('dpi', 150);
-            $options->set('fontHeightRatio', 1.1);
-
-            // Only set log file if directory is writable
-            if (is_writable($logsDir)) {
-                $options->set('logOutputFile', storage_path('logs/dompdf.log'));
-            }
+            $options->setIsRemoteEnabled(true);
+            $options->setIsHtml5ParserEnabled(true);
+            $options->setIsPhpEnabled(false);
+            $options->set('chroot', public_path());
+            $options->set('tempDir', storage_path('app/temp'));
+            $options->set('logOutputFile', storage_path('logs/dompdf.log'));
+            $options->setDefaultPaperSize('A4');
+            $options->setDefaultPaperOrientation('portrait');
 
             // Initialize DomPDF
             $dompdf = new Dompdf($options);

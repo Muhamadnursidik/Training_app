@@ -18,7 +18,7 @@ class DataProject extends BaseModel
     protected $fillable = [
         'kode_project',
         'mitra_id',
-        'nama_project',
+        'nama_project', 
         'tanggal_mulai',
         'tanggal_selesai',
     ];
