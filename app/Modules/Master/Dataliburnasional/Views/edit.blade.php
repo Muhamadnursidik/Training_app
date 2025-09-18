@@ -1,6 +1,6 @@
 @extends('layout.modal')
 
-@section('title', __('Form Edit Libur Nasional'))
+@section('title', __('Form Edit Data Libur Nasional'))
 
 @section('content')
     {{ Form::open(['id' => 'my-form', 'route' => [$module . '.update', encrypt($data->id)], 'method' => 'put', 'autocomplete' => 'off']) }}

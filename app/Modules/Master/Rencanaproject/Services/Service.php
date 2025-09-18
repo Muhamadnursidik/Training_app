@@ -92,21 +92,21 @@ class Service extends BaseService
         });
     }
 
-    public function get($id)
-    {
-        return Model::with(['parent'])->findOrFail($id);
-    }
-
-    // public static function get($id)
+    // public function get($id)
     // {
-    //     try {
-    //         $query = Model::find($id);
-    //         return $query ?: false;
-    //     } catch (\Exception $e) {
-    //         Log::error('Error getting data: ' . $e->getMessage());
-    //         return false;
-    //     }
+    //     return Model::with(['parent'])->findOrFail($id);
     // }
+
+    public static function get($id)
+    {
+        try {
+            $query = Model::find($id);
+            return $query ?: false;
+        } catch (\Exception $e) {
+            Log::error('Error getting data: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     public function update(array $data)
     {

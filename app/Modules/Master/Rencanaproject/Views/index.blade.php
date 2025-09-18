@@ -142,6 +142,15 @@
                 url: '{{ route($module . ".create") }}',
                 modal: '#modal-md',
                 className: 'btn btn-primary btn-add',
+            },
+            {
+                id: 'import',
+                title: 'Import Data',
+                url: '{{ route($module . ".import") }}',
+                modal: '#modal-md',
+                className: 'btn btn-warning btn-import ms-2',
+                icon: '<i data-feather="upload" class="feather-16"></i>',
+                toggle: 'modal'
             }
         ],
         actions: [
@@ -181,7 +190,11 @@
             });
         },
         onComplete: function() {
-            initModalAjax('.btn-add');
+            var _import = '{{ auth()->user()->can($module.".import") }}';
+            if(_import != '1'){
+                $('.btn-import').remove()
+            }
+            initModalAjax('.btn-add, .btn-import'); 
         },
         customRow: function(row, data) {
             $('td:eq(8)', row).find('.btn-restore').hide();

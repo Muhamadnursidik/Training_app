@@ -157,6 +157,5 @@
         initPage();
         initDatatableTools($('#main-table'), oTable);
     })
-    
 </script>
 @endpush
