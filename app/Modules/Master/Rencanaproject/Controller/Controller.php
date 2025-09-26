@@ -20,7 +20,7 @@ class Controller extends BaseModule
     public function __construct(Repository $repo, Service $service)
     {
         $this->repo    = $repo;
-        $this->service = $service;
+        $this->service = $service;  
         $this->module  = 'master.rencanaproject';
         parent::__construct();
     }
@@ -321,66 +321,199 @@ class Controller extends BaseModule
     {
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
-        $phpWord->setDefaultFontName('Arial');
+        // Set default font dan style
+        $phpWord->setDefaultFontName('Calibri');
         $phpWord->setDefaultFontSize(11);
 
-        $section = $phpWord->addSection();
+        // Add section dengan margin
+        $sectionStyle = [
+            'marginTop' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2),
+            'marginBottom' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2),
+            'marginLeft' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2),
+            'marginRight' => \PhpOffice\PhpWord\Shared\Converter::cmToTwip(2),
+            'orientation' => 'landscape'
+        ];
+        $section = $phpWord->addSection($sectionStyle);
+
+        // Header dengan logo dan info perusahaan
+        $header = $section->addHeader();
+        $headerTable = $header->addTable(['borderSize' => 0, 'cellMargin' => 50]);
+        $headerTable->addRow();
+        $headerTable->addCell(4000)->addText('PT. NAMA PERUSAHAAN', ['bold' => true, 'size' => 12], ['alignment' => 'left']);
+        $headerTable->addCell(4000)->addText('Sistem Informasi Manajemen Project', ['size' => 10], ['alignment' => 'center']);
+        $headerTable->addCell(4000)->addText('Tanggal: ' . now()->format('d/m/Y'), ['size' => 10], ['alignment' => 'right']);
 
         // Title
-        $section->addText('Laporan Rencana Project',
-            ['bold' => true, 'size' => 16],
-            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]
+        $section->addText('LAPORAN RENCANA PROJECT', 
+            ['bold' => true, 'size' => 18, 'color' => '2c3e50'], 
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 240]
         );
-        $section->addText('Laporan Lengkap Data Rencana Project',
-            ['size' => 12, 'color' => '666666'],
-            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]
-        );
+
+        // Info dan statistik
+        $infoTable = $section->addTable(['borderSize' => 6, 'borderColor' => 'cccccc', 'cellMargin' => 80]);
+        $infoTable->addRow();
+        $infoTable->addCell(2500)->addText('Tanggal Export:', ['bold' => true]);
+        $infoTable->addCell(2500)->addText(now()->format('d/m/Y H:i:s'));
+        $infoTable->addCell(2500)->addText('Total Data:', ['bold' => true]);
+        $infoTable->addCell(2500)->addText($data->count() . ' aktivitas');
+
+        $infoTable->addRow();
+        $infoTable->addCell(2500)->addText('User Export:', ['bold' => true]);
+        $infoTable->addCell(2500)->addText(auth()->user()->name ?? 'System');
+        $infoTable->addCell(2500)->addText('Total Project:', ['bold' => true]);
+        $infoTable->addCell(2500)->addText($data->unique('kode_project')->count() . ' project');
+
         $section->addTextBreak(1);
 
-        // Info
-        $section->addText('Tanggal Export: ' . date('d/m/Y H:i:s'), ['size' => 10, 'color' => '666666']);
-        $section->addText('Total Data: ' . $data->count() . ' records', ['size' => 10, 'color' => '666666']);
-        $section->addTextBreak(1);
-
-        // Table
-        $tableStyle = [
-            'borderSize'  => 6,
-            'borderColor' => '999999',
-            'cellMargin'  => 80,
-            'alignment'   => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
-        ];
-        $firstRowStyle = ['bgColor' => 'DDDDDD'];
-        $phpWord->addTableStyle('DataTable', $tableStyle, $firstRowStyle);
-
-        $table = $section->addTable('DataTable');
-
-        // Header
-        $table->addRow();
-        $table->addCell(800)->addText('No', ['bold' => true]);
-        $table->addCell(2000)->addText('Kode Project', ['bold' => true]);
-        $table->addCell(3000)->addText('Aktivitas', ['bold' => true]);
-        $table->addCell(1000)->addText('Level', ['bold' => true]);
-        $table->addCell(2000)->addText('Parent', ['bold' => true]);
-        $table->addCell(1200)->addText('Bobot', ['bold' => true]);
-        $table->addCell(2000)->addText('Mulai', ['bold' => true]);
-        $table->addCell(2000)->addText('Akhir', ['bold' => true]);
-        $table->addCell(1200)->addText('Minggu', ['bold' => true]);
-
-        // Data
-        foreach ($data as $index => $item) {
-            $table->addRow();
-            $table->addCell(800)->addText($index + 1);
-            $table->addCell(2000)->addText($item->kode_project);
-            $table->addCell(3000)->addText($item->aktivitas);
-            $table->addCell(1000)->addText($item->level);
-            $table->addCell(2000)->addText($item->parent ? $item->parent->aktivitas : '-');
-            $table->addCell(1200)->addText($item->bobot . '%');
-            $table->addCell(2000)->addText($item->tanggal_mulai ? $item->tanggal_mulai->format('d/m/Y') : '-');
-            $table->addCell(2000)->addText($item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-');
-            $table->addCell(1200)->addText($item->minggu_ke ?: '-');
+        // Filter information
+        if (isset($request) && !empty(array_filter($request->all()))) {
+            $section->addText('Filter yang Diterapkan:', ['bold' => true, 'size' => 12, 'color' => '2c3e50']);
+            $filterTable = $section->addTable(['borderSize' => 3, 'borderColor' => 'e0e0e0', 'cellMargin' => 60]);
+            
+            foreach ($request->all() as $key => $value) {
+                if (!empty($value) && !in_array($key, ['_token', '_method'])) {
+                    $filterTable->addRow();
+                    $filterTable->addCell(2000)->addText(ucfirst(str_replace('_', ' ', $key)) . ':', ['bold' => true]);
+                    $filterTable->addCell(6000)->addText($value);
+                }
+            }
+            $section->addTextBreak(1);
         }
 
-        $filename = 'rencana-project-' . date('Y-m-d-H-i-s') . '.docx';
+        // Statistik ringkasan
+        $stats = [
+            'Total Aktivitas' => $data->count(),
+            'Total Project' => $data->unique('kode_project')->count(),
+            'Root Activities' => $data->where('level', 1)->count(),
+            'Selesai' => $data->where('tanggal_akhir', '<', now()->format('Y-m-d'))->count(),
+            'Berjalan' => $data->where('tanggal_mulai', '<=', now()->format('Y-m-d'))
+                              ->where('tanggal_akhir', '>=', now()->format('Y-m-d'))->count(),
+        ];
+
+        $section->addText('Statistik Ringkasan:', ['bold' => true, 'size' => 12, 'color' => '2c3e50']);
+        $statsTable = $section->addTable([
+            'borderSize' => 6,
+            'borderColor' => '2c3e50',
+            'cellMargin' => 80,
+            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+        ]);
+        
+        // Header statistik
+        $statsTable->addRow(400);
+        foreach ($stats as $label => $value) {
+            $statsTable->addCell(2000, ['bgColor' => '34495e'])
+                      ->addText($label, ['bold' => true, 'color' => 'ffffff', 'size' => 10], ['alignment' => 'center']);
+        }
+        
+        // Data statistik
+        $statsTable->addRow(600);
+        foreach ($stats as $label => $value) {
+            $statsTable->addCell(2000, ['bgColor' => 'ecf0f1'])
+                      ->addText($value, ['bold' => true, 'size' => 14, 'color' => '2c3e50'], ['alignment' => 'center']);
+        }
+
+        $section->addTextBreak(1);
+
+        // Group data by project
+        $groupedData = $data->groupBy('kode_project');
+        $loop = collect($groupedData)->keys();
+
+        foreach ($groupedData as $kodeProject => $projectData) {
+            if (!$loop->first) {
+                $section->addPageBreak();
+            }
+
+            // Project header
+            $section->addText('PROJECT: ' . $kodeProject, 
+                ['bold' => true, 'size' => 14, 'color' => 'ffffff'], 
+                ['alignment' => 'left', 'bgColor' => '2c3e50', 'spaceAfter' => 120, 'spaceBefore' => 120]
+            );
+
+            // Project summary
+            $projectSummary = $section->addTable(['borderSize' => 3, 'borderColor' => '3498db', 'cellMargin' => 60]);
+            $projectSummary->addRow();
+            $projectSummary->addCell(2000)->addText('Total Aktivitas:', ['bold' => true]);
+            $projectSummary->addCell(2000)->addText($projectData->count());
+            $projectSummary->addCell(2000)->addText('Total Bobot:', ['bold' => true]);
+            $projectSummary->addCell(2000)->addText(number_format($projectData->sum('bobot'), 2) . '%');
+
+            $section->addTextBreak(1);
+
+            // Data table
+            $tableStyle = [
+                'borderSize' => 6,
+                'borderColor' => '999999',
+                'cellMargin' => 80,
+                'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            ];
+            $firstRowStyle = ['bgColor' => '34495e'];
+            $phpWord->addTableStyle('ProjectTable', $tableStyle, $firstRowStyle);
+
+            $table = $section->addTable('ProjectTable');
+            
+            // Header table
+            $table->addRow(500);
+            $table->addCell(400)->addText('No', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(3000)->addText('Aktivitas', ['bold' => true, 'color' => 'ffffff', 'size' => 9]);
+            $table->addCell(600)->addText('Level', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(2000)->addText('Parent', ['bold' => true, 'color' => 'ffffff', 'size' => 9]);
+            $table->addCell(800)->addText('Bobot', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(1200)->addText('Mulai', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(1200)->addText('Akhir', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(500)->addText('Minggu', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+            $table->addCell(800)->addText('Status', ['bold' => true, 'color' => 'ffffff', 'size' => 9], ['alignment' => 'center']);
+
+            // Data rows
+            foreach ($projectData->sortBy(['level', 'tanggal_mulai']) as $index => $item) {
+                // Determine status
+                $today = now()->format('Y-m-d');
+                $startDate = $item->tanggal_mulai ? $item->tanggal_mulai->format('Y-m-d') : null;
+                $endDate = $item->tanggal_akhir ? $item->tanggal_akhir->format('Y-m-d') : null;
+                
+                $status = 'Akan Datang';
+                $statusColor = 'f39c12';
+                
+                if ($endDate && $endDate < $today) {
+                    $status = 'Selesai';
+                    $statusColor = '95a5a6';
+                } elseif ($startDate && $startDate <= $today && $endDate && $endDate >= $today) {
+                    $status = 'Berjalan';
+                    $statusColor = '2ecc71';
+                }
+
+                // Row style (alternate colors)
+                $rowStyle = $index % 2 == 0 ? ['bgColor' => 'f8f9fa'] : [];
+                
+                $table->addRow(300, $rowStyle);
+                $table->addCell(400)->addText($index + 1, ['size' => 9], ['alignment' => 'center']);
+                
+                // Aktivitas dengan indentasi
+                $indent = str_repeat('    ', max(0, $item->level - 1));
+                $activityText = $indent . $item->aktivitas;
+                $table->addCell(3000)->addText($activityText, ['size' => 9]);
+                
+                $table->addCell(600)->addText($item->level, ['size' => 9, 'bold' => true], ['alignment' => 'center']);
+                $table->addCell(2000)->addText($item->parent ? $item->parent->aktivitas : '-', ['size' => 9]);
+                $table->addCell(800)->addText(number_format($item->bobot, 2) . '%', ['size' => 9], ['alignment' => 'right']);
+                $table->addCell(1200)->addText($item->tanggal_mulai ? $item->tanggal_mulai->format('d/m/Y') : '-', ['size' => 9], ['alignment' => 'center']);
+                $table->addCell(1200)->addText($item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-', ['size' => 9], ['alignment' => 'center']);
+                $table->addCell(500)->addText($item->minggu_ke ?: '-', ['size' => 9], ['alignment' => 'center']);
+                $table->addCell(800)->addText($status, ['size' => 9, 'color' => $statusColor, 'bold' => true], ['alignment' => 'center']);
+            }
+
+            $section->addTextBreak(1);
+        }
+
+        // Footer
+        $footer = $section->addFooter();
+        $footerTable = $footer->addTable(['borderSize' => 0]);
+        $footerTable->addRow();
+        $footerTable->addCell(4000)->addText('Laporan Rencana Project - ' . now()->format('d F Y'), ['size' => 9, 'color' => '7f8c8d']);
+        $footerTable->addCell(4000)->addText('Halaman {PAGE} dari {NUMPAGES}', ['size' => 9, 'color' => '7f8c8d'], ['alignment' => 'center']);
+        $footerTable->addCell(4000)->addText('Confidential', ['size' => 9, 'color' => '7f8c8d'], ['alignment' => 'right']);
+
+        // Save file
+        $filename = 'rencana-project-' . now()->format('Y-m-d-H-i-s') . '.docx';
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
 
         $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
