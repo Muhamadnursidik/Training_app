@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class Service extends BaseService
-{
+{   
     public function __construct()
     {
     }

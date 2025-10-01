@@ -5,4 +5,5 @@ return [
     'Tipeunitkerja',
     'Dataliburnasional',
     'Rencanaproject',
+    'Penyesuaianrencanaproject',
 ];

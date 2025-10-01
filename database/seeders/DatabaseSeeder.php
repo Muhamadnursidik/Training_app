@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             RolesAndPermissionsSeeder::class,
             InitConfig::class,
-            RencanaProjectSeeder::class
+            RencanaProjectSeeder::class,
+            PenyesuaianRencanaProjectSeeder::class,
         ]);
     }
 }
