@@ -12,7 +12,11 @@
         <div class="col-md-12">
             <div class="card overflow-hidden">
                 <div class="card-body">
+<<<<<<< HEAD
                     @include('components.information')
+=======
+                    @include('components.mini-dashboard')
+>>>>>>> dev
                 </div>
             </div>
         </div>
@@ -29,5 +33,9 @@
         $(function() {
             initPage();
         })
+<<<<<<< HEAD
     </script>
+=======
+    </script>   
+>>>>>>> dev
 @endpush

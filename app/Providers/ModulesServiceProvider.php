@@ -43,7 +43,11 @@ class ModulesServiceProvider extends \Illuminate\Support\ServiceProvider
         } else {
             $this->setModule($path . $modules);
         }
+<<<<<<< HEAD
        
+=======
+
+>>>>>>> dev
     }
 
     private function setModule($module)
@@ -57,6 +61,7 @@ class ModulesServiceProvider extends \Illuminate\Support\ServiceProvider
 
         // Load the views
         $view_dir = app_path(implode(DIRECTORY_SEPARATOR, ['Modules', $module, 'Views']));
+<<<<<<< HEAD
         
         if(is_dir($view_dir)) {
             $re = '/
@@ -68,6 +73,15 @@ class ModulesServiceProvider extends \Illuminate\Support\ServiceProvider
             $alias = preg_split($re, $module);
             
             $this->loadViewsFrom($view_dir, strtolower(implode('-', $alias)));
+=======
+
+        if(is_dir($view_dir)) {
+            // Convert module path to lowercase with backslashes for hint path
+            // Example: Master\DataMitra -> master\datamitra
+            $alias = str_replace(DIRECTORY_SEPARATOR, '\\', strtolower($module));
+
+            $this->loadViewsFrom($view_dir, $alias);
+>>>>>>> dev
             $this->list_modules['view_dir'][] = $view_dir; // enable me if you need show list module
         }
 

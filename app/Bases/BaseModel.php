@@ -5,7 +5,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
+<<<<<<< HEAD
 use Uuid;
+=======
+use Illuminate\Support\Str;
+>>>>>>> dev
 
 class BaseModel extends Model
 {
@@ -16,7 +20,11 @@ class BaseModel extends Model
 
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})){
+<<<<<<< HEAD
                 $model->{$model->getKeyName()} = Uuid::generate()->string;
+=======
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+>>>>>>> dev
             }
         });
     }
@@ -117,7 +125,11 @@ class BaseModel extends Model
             $cursor = $query->find($id);
             if ($cursor) {
                 $event = $cursor->update($data);
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> dev
                 // if contain callback
                 $return = ['_id' => encrypt($id)];
 
@@ -220,7 +232,11 @@ class BaseModel extends Model
     public function scopeDeleteBatch($query, array $id, $callback = NULL, $column = 'id')
     {
         try {
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> dev
             $cursors = $query->whereIn($column, $id)->get();
             if ($cursors) {
                 $deleted_id = [];
@@ -261,7 +277,11 @@ class BaseModel extends Model
         }
     }
 
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> dev
     public function scopeRestoreData($model, $id, $column = 'id', $callback)
     {
         try {

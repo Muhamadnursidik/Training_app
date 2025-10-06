@@ -17,7 +17,11 @@ $submodules =  [
     'Admin'    => include app_path('Modules/Admin/submodules.php'),
     'Master'    => include app_path('Modules/Master/submodules.php'),
     'Tools' => include app_path('Modules/Tools/submodules.php'),
+<<<<<<< HEAD
     // 'Laporan' => include app_path('Modules/Laporan/submodules.php'),
+=======
+    'Laporan' => include app_path('Modules/Laporan/submodules.php'),
+>>>>>>> dev
 ];
 
 return $submodules;

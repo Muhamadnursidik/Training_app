@@ -21,7 +21,11 @@ class InitConfig extends Seeder
                 "tipe" => "string",
                 "options" => "",
                 "fileallow" => "",
+<<<<<<< HEAD
                 "value" => "TRAINING APLIKASI",
+=======
+                "value" => "Progres Report Managment",
+>>>>>>> dev
             ],
             [
                 "key" => "app_sort_name",

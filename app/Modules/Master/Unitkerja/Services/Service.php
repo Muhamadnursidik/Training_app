@@ -305,7 +305,11 @@ class Service extends BaseService
     {
         $unit_kerja = Model::with('tipeunitkerja')->find($code);
         $tipe_unit_kerja = $unit_kerja->tipeunitkerja->code;
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> dev
         $api = new AuthAPI();
 
         $bagian = $api->getBagianKantor($code);
@@ -328,7 +332,11 @@ class Service extends BaseService
                 // }));
                 $filtered = $bagian;
                 break;
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> dev
             default:
                 $cond = ['Bagian KCU','KCU','Bagian KCP','KCP'];
                 // $filtered = array_values(array_filter($bagian, function ($item) use ($cond) {
@@ -404,9 +412,15 @@ class Service extends BaseService
                         ];
                     }
                 }
+<<<<<<< HEAD
                 
             }
             
+=======
+
+            }
+
+>>>>>>> dev
 
             if ($temp != null) {
                 if (auth()->user()->view_all_unit) {

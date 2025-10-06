@@ -1,7 +1,11 @@
 <?php
 namespace App\Bases;
 
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Validator;
+=======
+use Validator;
+>>>>>>> dev
 use Illuminate\Http\Request;
 
 abstract class BaseRepository

@@ -19,9 +19,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MenuSeeder::class,
             RolesAndPermissionsSeeder::class,
+<<<<<<< HEAD
             InitConfig::class,
             RencanaProjectSeeder::class,
             PenyesuaianRencanaProjectSeeder::class,
+=======
+            InitConfig::class
+>>>>>>> dev
         ]);
     }
 }
