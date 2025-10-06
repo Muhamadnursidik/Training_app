@@ -1,14 +1,12 @@
 <?php
-namespace App\Modules\Master\Penyesuaianrencanaproject\Controllers;
+namespace App\Modules\Progress\Mingguan\Controllers;
 
 use App\Bases\BaseModule;
-use App\Modules\Master\Penyesuaianrencanaproject\Models\Model;
-use App\Modules\Master\Penyesuaianrencanaproject\Repositories\Repository;
-use App\Modules\Master\Penyesuaianrencanaproject\Services\Service;
+use App\Modules\Progress\Mingguan\Models\Model;
+use App\Modules\Progress\Mingguan\Repositories\Repository;
+use App\Modules\Progress\Mingguan\Services\Service;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -21,7 +19,7 @@ class Controller extends BaseModule
     {
         $this->repo    = $repo;
         $this->service = $service;
-        $this->module  = 'master.penyesuaianrencanaproject'; 
+        $this->module  = 'progress.mingguan';
         parent::__construct();
     }
 
@@ -39,18 +37,7 @@ class Controller extends BaseModule
 
     public function create()
     {
-        $parents = Model::select('id', 'aktivitas', 'level')
-            ->orderBy('level')->orderBy('aktivitas')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id'    => $item->id,
-                    'level' => $item->level,
-                    'text'  => str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $item->level - 1) . $item->aktivitas,
-                ];
-            })->toArray();
-
-        return $this->serveView(compact('parents'));
+        return $this->serveView();
     }
 
     public function store(Request $request)
@@ -101,19 +88,19 @@ class Controller extends BaseModule
 
             $query = Model::query();
 
-            if ($request->filled('tanggal_mulai')) {
-                $query->whereDate('tanggal_mulai', $request->tanggal_mulai);
+            if ($request->filled('kode_project')) {
+                $query->where('kode_project', $request->kode_project);
             }
 
-            if ($request->filled('tanggal_akhir')) {
-                $query->whereDate('tanggal_akhir', $request->tanggal_akhir);
+            if ($request->filled('minggu_ke')) {
+                $query->where('minggu_ke', $request->minggu_ke);
             }
 
             if ($request->filled('aktivitas')) {
                 $query->where('aktivitas', 'like', '%' . $request->aktivitas . '%');
             }
 
-            $data = $query->orderBy('tanggal_mulai', 'desc')->get();
+            $data = $query->orderBy('tanggal_realisasi', 'desc')->get();
 
             switch ($format) {
                 case 'pdf':
@@ -133,8 +120,8 @@ class Controller extends BaseModule
 
     private function exportPDF($data)
     {
-        $pdf      = PDF::loadView('exports.ppdf', compact('data'));
-        $filename = 'penyesuaian-data-project-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+        $pdf      = PDF::loadView('exports.realisasi_rencana_pdf', compact('data'));
+        $filename = 'realisasi-rencana-mingguan-' . now()->format('Y-m-d-H-i-s') . '.pdf';
         return $pdf->download($filename);
     }
 
@@ -147,7 +134,7 @@ class Controller extends BaseModule
 
         // Header
         $table->addRow();
-        $headers = ['Kode Project', 'Aktivitas', 'Level', 'Parent Aktivitas', 'Bobot', 'Tanggal Mulai', 'Tanggal Akhir', 'Minggu Ke'];
+        $headers = ['Kode Project', 'Aktivitas', 'Minggu Ke', 'Realisasi', 'Tanggal Realisasi'];
         foreach ($headers as $header) {
             $table->addCell(2000)->addText($header, $fontStyle);
         }
@@ -157,15 +144,12 @@ class Controller extends BaseModule
             $table->addRow();
             $table->addCell(2000)->addText($item->kode_project);
             $table->addCell(2000)->addText($item->aktivitas);
-            $table->addCell(2000)->addText($item->level);
-            $table->addCell(2000)->addText($item->parent ? $item->parent->aktivitas : '-');
-            $table->addCell(2000)->addText($item->bobot ? $item->bobot . '%' : '0%');
-            $table->addCell(2000)->addText($item->tanggal_mulai ? $item->tanggal_mulai->format('d/m/Y') : '-');
-            $table->addCell(2000)->addText($item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-');
-            $table->addCell(2000)->addText($item->minggu_ke ?: '-');
+            $table->addCell(2000)->addText($item->minggu_ke);
+            $table->addCell(2000)->addText($item->realisasi);
+            $table->addCell(2000)->addText($item->tanggal_realisasi ? $item->tanggal_realisasi->format('d/m/Y') : '-');
         }
 
-        $filename = 'penyesuaian-data-project-' . now()->format('Y-m-d-H-i-s') . '.docx';
+        $filename = 'realisasi-rencana-mingguan-' . now()->format('Y-m-d-H-i-s') . '.docx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
@@ -181,7 +165,7 @@ class Controller extends BaseModule
         $sheet       = $spreadsheet->getActiveSheet();
 
         // Header
-        $headers = ['Kode Project', 'Aktivitas', 'Level', 'Parent Aktivitas', 'Bobot', 'Tanggal Mulai', 'Tanggal Akhir', 'Minggu Ke'];
+        $headers = ['Kode Project', 'Aktivitas', 'Minggu Ke', 'Realisasi', 'Tanggal Realisasi'];
         $col     = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue($col . '1', $header);
@@ -193,21 +177,18 @@ class Controller extends BaseModule
         foreach ($data as $item) {
             $sheet->setCellValue('A' . $row, $item->kode_project);
             $sheet->setCellValue('B' . $row, $item->aktivitas);
-            $sheet->setCellValue('C' . $row, $item->level);
-            $sheet->setCellValue('D' . $row, $item->parent ? $item->parent->aktivitas : '-');
-            $sheet->setCellValue('E' . $row, $item->bobot ? $item->bobot . '%' : '0%');
-            $sheet->setCellValue('F' . $row, $item->tanggal_mulai ? $item->tanggal_mulai->format('d/m/Y') : '-');
-            $sheet->setCellValue('G' . $row, $item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-');
-            $sheet->setCellValue('H' . $row, $item->minggu_ke ?: '-');
+            $sheet->setCellValue('C' . $row, $item->minggu_ke);
+            $sheet->setCellValue('D' . $row, $item->realisasi);
+            $sheet->setCellValue('E' . $row, $item->tanggal_realisasi ? $item->tanggal_realisasi->format('d/m/Y') : '-');
             $row++;
         }
 
         // Auto size columns
-        foreach (range('A', 'H') as $col) {
+        foreach (range('A', 'E') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        $filename = 'penyesuaian-data-project-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
+        $filename = 'realisasi-rencana-mingguan-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');

@@ -19,9 +19,11 @@
                                 <a href="{{ route($module . '.export', ['type' => 'excel']) }}" class="dropdown-item"><i class="bx bx-spreadsheet bx-xs text-success"></i> Export Excel</a>
                                 <a href="{{ route($module . '.export', ['type' => 'word']) }}" class="dropdown-item"><i class="bx bx-file bx-xs text-info"></i> Export Word</a>
                             @endpush
+
                             <div class="row">
                                 <div class="col-md-10">
                                     <div class="row">
+
                                         <!-- Kode Project -->
                                         <div class="col-md-6">
                                             <div class="form-group row mb-1">
@@ -32,47 +34,22 @@
                                             </div>
                                         </div>
 
-                                        <!-- Kode Addendum -->
-                                        <div class="col-md-6">
-                                            <div class="form-group row mb-1">
-                                                <label for="kode_addendum" class="col-sm-3 col-form-label">{{ __('Addendum') }}</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" name="kode_addendum" id="kode_addendum" class="form-control" placeholder="Masukkan kode addendum">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Aktivitas -->
-                                        <div class="col-md-6">
-                                            <div class="form-group row mb-1">
-                                                <label for="aktivitas" class="col-sm-3 col-form-label">{{ __('Aktivitas') }}</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" name="aktivitas" id="aktivitas" class="form-control" placeholder="Cari aktivitas...">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Level -->
-                                        <div class="col-md-6">
-                                            <div class="form-group row mb-1">
-                                                <label for="level" class="col-sm-3 col-form-label">{{ __('Level') }}</label>
-                                                <div class="col-sm-9">
-                                                    <select name="level" id="level" class="form-control">
-                                                        <option value="">{{ __('- Semua Level -') }}</option>
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            <option value="{{ $i }}">{{ __('Level') }} {{ $i }}</option>
-                                                        @endfor
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
                                         <!-- Minggu Ke -->
                                         <div class="col-md-6">
                                             <div class="form-group row mb-1">
                                                 <label for="minggu_ke" class="col-sm-3 col-form-label">{{ __('Minggu Ke') }}</label>
                                                 <div class="col-sm-9">
                                                     <input type="number" name="minggu_ke" id="minggu_ke" class="form-control" min="1" max="53" placeholder="1-53">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Progress (%) -->
+                                        <div class="col-md-6">
+                                            <div class="form-group row mb-1">
+                                                <label for="progres" class="col-sm-3 col-form-label">{{ __('Progress (%)') }}</label>
+                                                <div class="col-sm-9">
+                                                    <input type="number" name="progres" id="progres" class="form-control" min="0" max="100" placeholder="0-100">
                                                 </div>
                                             </div>
                                         </div>
@@ -95,6 +72,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -126,14 +104,11 @@
                     'form_filter' => '#form-filter',
                     'header' => [
                         'Project',
-                        'Addendum',
-                        'Aktivitas', 
-                        'Level',
-                        'Parent',
-                        'Bobot (%)',
+                        'Minggu Ke',
                         'Tanggal Mulai',
                         'Tanggal Akhir',
-                        'Minggu Ke'
+                        'Progress (%)',
+                        'Keterangan',
                     ],
                     'data_source' => route($module . '.data'),
                 ])
@@ -153,21 +128,12 @@
                 url: '{{ route($module . ".create") }}',
                 modal: '#modal-md',
                 className: 'btn btn-primary btn-add',
-            },
-            {
-                id: 'import',
-                title: 'Import Data',
-                url: '{{ route($module . ".import") }}',
-                modal: '#modal-md',
-                className: 'btn btn-warning btn-import ms-2',
-                icon: '<i data-feather="upload" class="feather-16"></i>',
-                toggle: 'modal'
             }
         ],
         actions: [
             {
                 id: 'edit',
-                url: '{{ route($module . ".edit", ["penyesuaianrencanaproject" => "__grid_doc__"]) }}',
+                url: '{{ route($module . ".edit", ["mingguan" => "__grid_doc__"]) }}',
                 modal: '#modal-md',
                 className: "btn btn-light p-1 pb-1 btn-edit"
             },
@@ -179,14 +145,11 @@
         ],
         columns: [
             {data: 'kode_project', name: 'kode_project'},
-            {data: 'kode_addendum', name: 'kode_addendum'},
-            {data: 'aktivitas', name: 'aktivitas'},
-            {data: 'level', name: 'level'},
-            {data: 'parent.aktivitas', name: 'parent.aktivitas'},
-            {data: 'bobot', name: 'bobot'},
+            {data: 'minggu_ke', name: 'minggu_ke'},
             {data: 'tanggal_mulai', name: 'tanggal_mulai'},
             {data: 'tanggal_akhir', name: 'tanggal_akhir'},
-            {data: 'minggu_ke', name: 'minggu_ke'},
+            {data: 'progres', name: 'progres'},
+            {data: 'keterangan', name: 'keterangan'},
             {data: 'action', orderable: false, searchable: false},
         ],
         onDraw: function() {
@@ -196,11 +159,7 @@
             });
         },
         onComplete: function() {
-            var _import = '{{ auth()->user()->can($module.".import") }}';
-            if(_import != '1'){
-                $('.btn-import').remove()
-            }
-            initModalAjax('.btn-add, .btn-import'); 
+            initModalAjax('.btn-add'); 
         }
     });
 </script>

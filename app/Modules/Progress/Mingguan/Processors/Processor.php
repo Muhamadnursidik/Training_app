@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Modules\Master\Rencanaproject\Processors;
+namespace App\Modules\Progress\Mingguan\Processors;
 
 use App\Bases\BaseProcessor;
-use App\Modules\Master\Rencanaproject\Services\Service;
+use App\Modules\Progress\Mingguan\Services\Service;
 use Exception;
 
 class Processor extends BaseProcessor
@@ -47,18 +47,35 @@ class Processor extends BaseProcessor
                     $this->output = $this->service->restore($data);
                     break;
 
-                case 'parent_options':
-                    $this->output = $this->service->getParentOptions($data['exclude_id'] ?? null);
-                    break;
-
                 case 'by_project':
-                    $this->output = $this->service->getByProject($data['kode_project']);
+                    $kodeProject = $data['kode_project'] ?? null;
+                    if (!$kodeProject) {
+                        throw new Exception("Parameter 'kode_project' diperlukan");
+                    }
+                    $this->output = $this->service->getByProject($kodeProject);
                     break;
 
-                case 'total_bobot':
-                    $this->output = $this->service->getTotalBobot($data['kode_project']);
+                case 'by_week':
+                    $minggu = $data['minggu_ke'] ?? null;
+                    if (!$minggu) {
+                        throw new Exception("Parameter 'minggu_ke' diperlukan");
+                    }
+                    $this->output = $this->service->getByWeek($minggu);
                     break;
+
+                case 'by_date_range':
+                    $start = $data['start_date'] ?? null;
+                    $end   = $data['end_date'] ?? null;
+                    if (!$start || !$end) {
+                        throw new Exception("Parameter 'start_date' dan 'end_date' diperlukan");
+                    }
+                    $this->output = $this->service->getByDateRange($start, $end);
+                    break;
+
+                default:
+                    throw new Exception("Operation type [$operation_type] tidak dikenali.");
             }
+
             return true;
         } catch (Exception $e) {
             $this->output = $e;
