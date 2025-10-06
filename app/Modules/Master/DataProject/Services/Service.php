@@ -62,7 +62,6 @@ class Service extends BaseService
         ]);
     }
 
-
     public static function get($id)
     {
         $query = DataProject::with('mitra')->find($id);
@@ -111,7 +110,7 @@ class Service extends BaseService
     }
 
     public function destroys(array $data)
-    {
+    { 
         $ids = array_map(fn($id) => decrypt($id), $data['id'] ?? []);
 
         $projects = DataProject::whereIn('id', $ids)->get();
@@ -119,7 +118,7 @@ class Service extends BaseService
         foreach ($projects as $project) {
             if ($project->mitra) {
                 throw new \Exception("Project {$project->nama_project} tidak bisa dihapus karena masih terkait dengan Mitra");
-            }
+            } 
             $project->forceDelete();
         }
 
@@ -278,13 +277,13 @@ class Service extends BaseService
             $filePath = storage_path('app/temp/' . $filename);
             if (!file_exists(dirname($filePath))) {
                 mkdir(dirname($filePath), 0755, true);
-            }
+           }
 
-            $writer = WordIOFactory::createWriter($phpWord, 'Word2007');
-            $writer->save($filePath);
+           $writer = WordIOFactory::createWriter($phpWord, 'Word2007');
+           $writer->save($filePath);
 
-            return response()->download($filePath)->deleteFileAfterSend();
-        } catch (\Exception $e) {
+           return response()->download($filePath)->deleteFileAfterSend();
+       } catch (\Exception $e) {
             throw new \Exception('Gagal export Word: ' . $e->getMessage());
         }
     }

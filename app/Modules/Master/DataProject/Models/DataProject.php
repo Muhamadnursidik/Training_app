@@ -5,6 +5,7 @@ namespace App\Modules\Master\DataProject\Models;
 use App\Bases\BaseModel;
 use App\Modules\Master\DataMitra\Models\Datamitra;
 use Spatie\Activitylog\LogOptions;
+use Carbon\Carbon;
 
 class DataProject extends BaseModel
 {
@@ -20,12 +21,12 @@ class DataProject extends BaseModel
         'mitra_id',
         'nama_project', 
         'tanggal_mulai',
-        'tanggal_selesai',
+        'tanggal_akhir',
     ];
 
     protected $casts = [
         'tanggal_mulai'   => 'date',
-        'tanggal_selesai' => 'date',
+        'tanggal_akhir'   => 'date',
         'created_at'      => 'datetime',
         'updated_at'      => 'datetime',
     ];
@@ -33,6 +34,16 @@ class DataProject extends BaseModel
     public function mitra()
     {
         return $this->belongsTo(Datamitra::class, 'mitra_id', 'id');
+    }
+
+    public function getTanggalMulaiAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('Y-m-d') : null;
+    }
+
+    public function getTanggalAkhirAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('Y-m-d') : null;
     }
 
     public function getActivitylogOptions(): LogOptions

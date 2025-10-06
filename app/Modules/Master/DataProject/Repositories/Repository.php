@@ -72,9 +72,9 @@ class Repository
                     'id'                => encrypt($item->id),
                     'kode_project'      => $item->kode_project,
                     'nama_project'      => $item->nama_project,
-                    'kode_mitra_display' => $item->mitra?->kode_mitra, // ✅ ambil kode_mitra, bukan nama_mitra
-                    'tanggal_mulai'     => $item->tanggal_mulai?->format('Y-m-d'),
-                    'tanggal_akhir'     => $item->tanggal_akhir?->format('Y-m-d'),
+                    'kode_mitra_display' => $item->mitra?->kode_mitra,
+                    'tanggal_mulai'     => $item->tanggal_mulai,
+                    'tanggal_akhir'     => $item->tanggal_akhir,
                     'DT_RowId'          => encrypt($item->id),
                 ];
             });

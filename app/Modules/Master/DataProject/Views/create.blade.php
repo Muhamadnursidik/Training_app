@@ -77,7 +77,7 @@
       e.preventDefault();
 
       $('#btn-submit').prop('disabled', true).text('Menyimpan...');
-      $('.modal-content').waitMe({ effect: 'progressBar', color: '#095d2d' });
+      $('.modal-content').waitMe({ effect: 'progressBar', color: '#095d2d' });  
 
       var formData = $(this).serialize();
 
@@ -95,7 +95,7 @@
               if (response.status === true || response.status === 'success') {
                   $('.modal').modal('hide');
                   if (typeof oTable !== 'undefined') {
-                      oTable.reload();
+                      oTable.reload();  
                   }
                   Swal.fire({
                       title: 'Berhasil',

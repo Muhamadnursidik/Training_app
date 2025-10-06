@@ -29,5 +29,5 @@
         $(function() {
             initPage();
         })
-    </script>
+    </script>   
 @endpush

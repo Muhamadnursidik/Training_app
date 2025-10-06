@@ -160,7 +160,7 @@
         var exportUrls = {
             'pdf': '{{ route("master.dataproject.export.pdf") }}',
             'excel': '{{ route("master.dataproject.export.excel") }}',
-            'word': '{{ route("master.dataproject.export.word") }}'
+            'word': '{{  ("master.dataproject.export.word") }}'
         };
 
         var url = exportUrls[format];
